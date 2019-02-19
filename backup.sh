@@ -76,10 +76,9 @@ send_slack_message() {
 
   echo 'Sending to '${SLACK_CHANNEL}'...'
   curl --silent --data-urlencode \
-    "$(printf 'payload={"channel": "%s", "username": "%s", "link_names": "true", "icon_emoji": "%s", "attachments": [{"author_name": "mongodb-gcs-backup", "title": "%s", "text": "%s", "color": "%s"}]}' \
+    "$(printf 'payload={"channel": "%s", "username": "%s", "link_names": "true", "attachments": [{"author_name": "mongodb-gcs-backup", "title": "%s", "text": "%s", "color": "%s"}]}' \
         "${SLACK_CHANNEL}" \
         "${SLACK_USERNAME}" \
-        "${SLACK_ICON}" \
         "${title}" \
         "${message}" \
         "${color}" \

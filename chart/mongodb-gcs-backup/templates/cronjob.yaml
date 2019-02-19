@@ -1,12 +1,9 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ template "mongodb-gcs-backup.fullname" . }}
+  name: {{ .Release.Name }}-mongodb-gcs-backup
   labels:
-    app: {{ template "mongodb-gcs-backup.name" . }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app.kubernetes.io/name: {{ .Release.Name }}-mongodb-gcs-backup
 spec:
   concurrencyPolicy: {{ .Values.concurrencyPolicy }}
   failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
@@ -16,25 +13,42 @@ spec:
     spec:
       template:
         metadata:
-          name: {{ template "mongodb-gcs-backup.fullname" . }}
+          name: {{ .Release.Name }}-mongodb-gcs-backup
           labels:
-            app: {{ .Release.Name }}
-            cron: {{ template "mongodb-gcs-backup.name" . }}
+            app.kubernetes.io/name: {{ .Release.Name }}-mongodb-gcs-backup
+            cron: {{ .Release.Name }}-mongodb-gcs-backup
         spec:
           containers:
-          - name: {{ .Chart.Name }}
+          - name: {{ .Release.Name }}-mongodb-gcs-backup
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             env:
-{{ toYaml .Values.env | indent 12 }}
+              - name: GCS_BUCKET
+                value: {{ .Values.env.GCS_BUCKET }}
+              - name: GCS_KEY_FILE_PATH
+                value: "/etc/gcp/sa_credentials.json"
+              - name: MONGODB_HOST
+                value: {{ .Values.env.MONGODB_HOST }}
+              - name: MONGODB_PORT
+                value: {{ .Values.env.MONGODB_PORT }}
+              - name: MONGODB_DB
+                value: {{ .Values.env.MONGODB_DB }}
+              - name: SLACK_ALERTS
+                value: {{ .Values.env.SLACK_ALERTS }}
+              - name: SLACK_WEBHOOK_URL
+                value: {{ .Values.env.SLACK_WEBHOOK_URL }}
+              - name: SLACK_CHANNEL
+                value: {{ .Values.env.SLACK_CHANNEL }}
+              - name: SLACK_USERNAME
+                value: {{ .Values.env.SLACK_USERNAME }}
             volumeMounts:
-              - name: gcp-credentials
-                mountPath: /secrets/gcp
+              - name: mongodb-gcs-backup-credentials
+                mountPath: /etc/gcp
                 readOnly: true
             resources:
   {{ toYaml .Values.resources | indent 12 }}
           restartPolicy: {{ .Values.restartPolicy }}
           volumes:
-            - name: gcp-credentials
+            - name: mongodb-gcs-backup-credentials
               secret:
                 secretName: {{ .Values.secretName }}

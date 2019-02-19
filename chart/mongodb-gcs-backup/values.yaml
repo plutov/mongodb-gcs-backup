@@ -1,7 +1,9 @@
 image:
-  repository: zoov/mongodb-gcs-backup
+  repository: pltvs/mongodb-gcs-backup
   tag: latest
   pullPolicy: IfNotPresent
+
+secretName:
 
 resources: {}
 #  limits:
@@ -10,6 +12,16 @@ resources: {}
 #  requests:
 #    cpu: 100m
 #    memory: 128Mi
+
+env:
+  GCS_BUCKET:
+  MONGODB_HOST: localhost
+  MONGODB_PORT: 27017
+  MONGODB_DB:
+  SLACK_ALERTS:
+  SLACK_WEBHOOK_URL:
+  SLACK_CHANNEL:
+  SLACK_USERNAME:
 
 concurrencyPolicy: Forbid
 failedJobsHistoryLimit: 1
