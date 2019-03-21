@@ -8,6 +8,7 @@ set -o nounset
 
 BACKUP_DIR=${BACKUP_DIR:-/tmp}
 BOTO_CONFIG_PATH=${BOTO_CONFIG_PATH:-/root/.boto}
+AWS_BACKUP_ENABLED=${AWS_BACKUP_ENABLED:-}
 AWS_ACCESS_KEY=${AWS_ACCESS_KEY:-}
 AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
 AWS_CONFIG_FOLDER=${AWS_CONFIG_FOLDER:-/root/.aws}
@@ -78,9 +79,11 @@ EOF
 }
 
 upload_to_s3() {
-  mkdir -p $AWS_CONFIG_FOLDER
-    if [[ $AWS_ACCESS_KEY != "" ]] && [[ $AWS_SECRET_ACCESS_KEY != "" ]]
-    then 
+  if [[ $AWS_BACKUP_ENABLED == "true" ]] 
+  then 
+    mkdir -p $AWS_CONFIG_FOLDER
+      if [[ $AWS_ACCESS_KEY != "" ]] && [[ $AWS_SECRET_ACCESS_KEY != "" ]]
+      then 
 cat <<EOF > $AWS_CONFIG_CREDENTIALS_FILE
   [default]
   aws_access_key_id= $AWS_ACCESS_KEY
@@ -91,9 +94,10 @@ cat <<EOF > $AWS_CONFIG_FILE
   region= $AWS_REGION
   output= $AWS_OUTPUT_FORMAT
 EOF
-    fi
-  echo "uploading backup archive to AWS bucket=$AWS_BUCKET"
-  aws s3 cp $BACKUP_DIR/$archive_name ${AWS_BUCKET}
+      fi
+    echo "uploading backup archive to AWS bucket=$AWS_BUCKET"
+    aws s3 cp $BACKUP_DIR/$archive_name ${AWS_BUCKET}
+  fi 
 }
 
 send_slack_message() {

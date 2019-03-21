@@ -18,6 +18,7 @@ The following table lists the configurable parameters you can set up.
 
 Environment Variable | Required | Default | Description
 ---------------------|----------|---------|-------------
+`AWS_BACKUP_ENABLED` | No | `false` | Defines whether you want to upload your backup to AWS S3.
 `AWS_BUCKET` | Yes | | The AWS bucket you want to upload the backup to.
 `AWS_REGION` | No | `us-east-2` | The AWS region where your bucket exists
 `AWS_ACCESS_KEY` | Yes | | Your access Key in AWS
