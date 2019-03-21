@@ -4,7 +4,8 @@ RUN apt-get update && \
   apt-get -y upgrade && \
   apt-get install -y curl && \
   apt-get install -y python-pip && \
-  pip install gsutil
+  pip install gsutil && \
+  apt-get -y install awscli
 
 ADD ./backup.sh /mongodb-gcs-backup/backup.sh
 WORKDIR /mongodb-gcs-backup

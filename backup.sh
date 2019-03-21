@@ -8,6 +8,15 @@ set -o nounset
 
 BACKUP_DIR=${BACKUP_DIR:-/tmp}
 BOTO_CONFIG_PATH=${BOTO_CONFIG_PATH:-/root/.boto}
+AWS_BACKUP_ENABLED=${AWS_BACKUP_ENABLED:-}
+AWS_ACCESS_KEY=${AWS_ACCESS_KEY:-}
+AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+AWS_CONFIG_FOLDER=${AWS_CONFIG_FOLDER:-/root/.aws}
+AWS_CONFIG_CREDENTIALS_FILE=${AWS_CONFIG_CREDENTIALS_FILE:-/root/.aws/credentials}
+AWS_CONFIG_FILE=${AWS_CONFIG_FILE:-/root/.aws/config}
+AWS_BUCKET=${AWS_BUCKET:-}
+AWS_REGION=${AWS_REGION:-us-east-2}
+AWS_OUTPUT_FORMAT=${AWS_OUTPUT_FORMAT:-json}
 GCS_BUCKET=${GCS_BUCKET:-}
 GCS_KEY_FILE_PATH=${GCS_KEY_FILE_PATH:-}
 MONGODB_HOST=${MONGODB_HOST:-localhost}
@@ -69,6 +78,28 @@ EOF
   gsutil cp $BACKUP_DIR/$archive_name $GCS_BUCKET
 }
 
+upload_to_s3() {
+  if [[ $AWS_BACKUP_ENABLED == "true" ]] 
+  then 
+    mkdir -p $AWS_CONFIG_FOLDER
+      if [[ $AWS_ACCESS_KEY != "" ]] && [[ $AWS_SECRET_ACCESS_KEY != "" ]]
+      then 
+cat <<EOF > $AWS_CONFIG_CREDENTIALS_FILE
+  [default]
+  aws_access_key_id= $AWS_ACCESS_KEY
+  aws_secret_access_key= $AWS_SECRET_ACCESS_KEY
+EOF
+cat <<EOF > $AWS_CONFIG_FILE
+  [default]
+  region= $AWS_REGION
+  output= $AWS_OUTPUT_FORMAT
+EOF
+      fi
+    echo "uploading backup archive to AWS bucket=$AWS_BUCKET"
+    aws s3 cp $BACKUP_DIR/$archive_name ${AWS_BUCKET}
+  fi 
+}
+
 send_slack_message() {
   local color=${1}
   local title=${2}
@@ -103,5 +134,6 @@ cleanup() {
 trap err ERR
 backup
 upload_to_gcs
+upload_to_s3
 cleanup
 echo "backup done!"
