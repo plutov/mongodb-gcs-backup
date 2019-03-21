@@ -18,7 +18,11 @@ The following table lists the configurable parameters you can set up.
 
 Environment Variable | Required | Default | Description
 ---------------------|----------|---------|-------------
-`GCS_BUCKET` | Yes |  | The bucket you want to upload the backup archive to.
+`AWS_BUCKET` | Yes | | The AWS bucket you want to upload the backup to.
+`AWS_REGION` | No | `us-east-2` | The AWS region where your bucket exists
+`AWS_ACCESS_KEY` | Yes | | Your access Key in AWS
+`AWS_SECRET_ACCESS_KEY` | Yes | | Your secret access Key in AWS
+`GCS_BUCKET` | Yes |  | The GCS bucket you want to upload the backup archive to.
 `MONGODB_HOST` | No | `localhost` | The MongoDB server host.
 `MONGODB_PORT` | No | `27017` | The MongoDB port.
 `MONGODB_DB` | No |  | The database to backup. By default, a backup of all the databases will be performed.
